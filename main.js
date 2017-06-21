@@ -8,8 +8,10 @@ let mainWindow;
 
 app.on('ready', function() {
     mainWindow = new BrowserWindow({
-        height: 600,
-        width: 800
+        frame: false,
+        height: 700,
+        width: 368,
+        resizable: false
     });
 
     mainWindow.loadURL('file://' + __dirname + '/app/index.html');
