@@ -23,3 +23,13 @@ var closeEl = document.querySelector('.close');
 closeEl.addEventListener('click', () => {
     ipcRenderer.send('close-main-window');
 });
+
+ipcRenderer.on('global-shortcut', (e, arg) => {
+    var event = new MouseEvent('click');
+    soundButtons[arg].dispatchEvent(event);
+});
+
+var settingsEl = document.querySelector('.settings');
+settingsEl.addEventListener('click', () => {
+    ipcRenderer.send('open-settings-window');
+});
