@@ -1,3 +1,5 @@
+const {ipcRenderer} = require('electron')
+
 var soundButtons = document.querySelectorAll('.button-sound');
 
 for (var i = 0; i < soundButtons.length; i++) {
@@ -16,3 +18,8 @@ function prepareButton(buttonEl, soundName) {
         audio.play();
     });
 }
+
+var closeEl = document.querySelector('.close');
+closeEl.addEventListener('click', () => {
+    ipcRenderer.send('close-main-window');
+});

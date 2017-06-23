@@ -3,6 +3,8 @@ const electron = require('electron')
 const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
+// Module to handle messages sent from renderer processes (web pages)
+const ipcMain = electron.ipcMain
 
 let mainWindow;
 
@@ -15,4 +17,8 @@ app.on('ready', function() {
     });
 
     mainWindow.loadURL('file://' + __dirname + '/app/index.html');
+});
+
+ipcMain.on('close-main-window', () => {
+    app.quit();
 });
