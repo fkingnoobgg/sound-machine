@@ -6,6 +6,7 @@ const BrowserWindow = electron.BrowserWindow
 // Module to handle messages sent from renderer processes (web pages)
 const ipcMain = electron.ipcMain
 const globalShortcut = electron.globalShortcut
+const configuration = require('./configuration');
 
 let mainWindow;
 let settingsWindow;
@@ -18,16 +19,15 @@ app.on('ready', function() {
         resizable: false
     });
 
+    if (!configuration.readSettings('shortcutKeys')) {
+        configuration.saveSettings('shortcutKeys', ['ctrl', 'shift']);
+    }
+
     mainWindow.loadURL('file://' + __dirname + '/app/index.html');
 
     mainWindow.webContents.openDevTools();
 
-    globalShortcut.register('ctrl+shift+1', () => {
-        mainWindow.webContents.send('global-shortcut', 0);
-    });
-    globalShortcut.register('ctrl+shift+2', () => {
-        mainWindow.webContents.send('global-shortcut', 1);
-    });
+    setGlobalShortcuts();
 });
 
 ipcMain.on('close-main-window', () => {
@@ -59,3 +59,27 @@ ipcMain.on('close-settings-window', () => {
         settingsWindow.close();
     }
 })
+
+ipcMain.on('set-global-shortcuts', () => {
+    setGlobalShortcuts();
+});
+
+function setGlobalShortcuts() {
+    globalShortcut.unregisterAll();
+
+    var shortcutKeysSetting = configuration.readSettings('shortcutKeys');
+    var shortcutPrefix = shortcutKeysSetting.length === 0 ? '' : shortcutKeysSetting.join('+') + '+';
+
+    globalShortcut.register(shortcutPrefix + '1', function () {
+        mainWindow.webContents.send('global-shortcut', 0);
+    });
+    globalShortcut.register(shortcutPrefix + '2', function () {
+        mainWindow.webContents.send('global-shortcut', 1);
+    });
+    globalShortcut.register(shortcutPrefix + '3', function () {
+        mainWindow.webContents.send('global-shortcut', 2);
+    });
+    globalShortcut.register(shortcutPrefix + '4', function () {
+        mainWindow.webContents.send('global-shortcut', 3);
+    });
+}
