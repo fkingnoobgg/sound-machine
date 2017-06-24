@@ -1,4 +1,8 @@
+const {Menu, Tray} = require('electron').remote
 const {ipcRenderer} = require('electron')
+path = require('path')
+
+let tray = null
 
 var soundButtons = document.querySelectorAll('.button-sound');
 
@@ -33,3 +37,32 @@ var settingsEl = document.querySelector('.settings');
 settingsEl.addEventListener('click', () => {
     ipcRenderer.send('open-settings-window');
 });
+
+
+if (process.platform === 'darwin') {
+    tray = new Tray(path.join(__dirname, 'img/tray-iconTemplate.png'));
+}
+else {
+    tray = new Tray(path.join(__dirname, 'img/tray-icon-alt.png'));
+}
+
+var trayMenuTemplate = [
+    {
+        label: 'Sound machine',
+        enabled: false
+    },
+    {
+        label: 'Settings',
+        click: function () {
+            ipcRenderer.send('open-settings-window');
+        }
+    },
+    {
+        label: 'Quit',
+        click: function () {
+            ipcRenderer.send('close-main-window');
+        }
+    }
+];
+var trayMenu = Menu.buildFromTemplate(trayMenuTemplate);
+tray.setContextMenu(trayMenu);
