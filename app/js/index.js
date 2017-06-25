@@ -58,6 +58,15 @@ var trayMenuTemplate = [
         }
     },
     {
+        label: 'About',
+        click: function () {
+            ipcRenderer.send('open-aboutApp-window');
+        }
+    },
+    {
+        type: 'separator'
+    },
+    {
         label: 'Quit',
         click: function () {
             ipcRenderer.send('close-main-window');

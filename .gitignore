@@ -2,3 +2,4 @@
 node_modules
 *.log
 releases/
+sound_machine-darwin-x64
