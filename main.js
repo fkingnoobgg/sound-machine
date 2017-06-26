@@ -5,10 +5,17 @@ const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 // Module to handle messages sent from renderer processes (web pages)
 const ipcMain = electron.ipcMain
+// for makeing shortcuts/accelerators
 const globalShortcut = electron.globalShortcut
+// our custom module that we made
 const configuration = require('./configuration');
+// to make menus for electron apps
 const Menu = electron.Menu
+// for making server requests, e.g. calling api.github.com
 const rp = require('request-promise');
+// for native notifications
+const notifier = require('node-notifier');
+const path = require('path');
 
 let mainWindow = null;
 let settingsWindow = null;
@@ -216,8 +223,11 @@ function createAboutAppWindow() {
 * Making remote calls to check version
 */
 function getRemoteVersion() {
+  let remoteVersion = null;
+  const clientVersion = app.getVersion();
+
   var options = {
-      uri: 'https://api.github.com/repos/fkingnoobgg/sound-machine/contents/version.txt',
+      uri: 'https://api.github.com/repos/fkingnoobgg/sound-machine/contents/package.json',
       headers: {
           'User-Agent': 'Request-Promise',
           'Accept': 'application/vnd.github.VERSION.raw'
@@ -226,9 +236,26 @@ function getRemoteVersion() {
 
   rp(options)
       .then(function (res) {
-          console.log(res);
+          remoteVersion = JSON.parse(res).version
+          // when the remote version is different to local version then a new update is
+          // available therefore notify the user of this
+          if (remoteVersion != clientVersion){
+            notifier.notify({
+              title: 'Version Update',
+              message: 'New version available!',
+              icon: path.join(__dirname, 'app/img/app-icon.ico'),
+              sound: true, // Only Notification Center or Windows Toasters
+              wait: true // Wait with callback, until user action is taken against notification
+            }, function (err, response) {
+              // Response is response from notification
+            });
+            notifier.on('click', function (notifierObject, options) {
+              electron.shell.openExternal('http://github.com/fkingnoobgg/sound-machine')// Triggers if `wait: true` and user clicks notification
+            });
+          }
       })
       .catch(function (err) {
-          console.log("something went wrong while retrieving version")
+          notifier.notify("Couldn't connect to api.github.com please check \
+          your internet connection");
       });
 }
