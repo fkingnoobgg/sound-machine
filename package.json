@@ -10,6 +10,8 @@
     "electron": "^1.6.8"
   },
   "dependencies": {
-    "nconf": "^0.8.4"
+    "nconf": "^0.8.4",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.1"
   }
 }

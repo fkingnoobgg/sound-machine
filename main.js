@@ -8,6 +8,7 @@ const ipcMain = electron.ipcMain
 const globalShortcut = electron.globalShortcut
 const configuration = require('./configuration');
 const Menu = electron.Menu
+const rp = require('request-promise');
 
 let mainWindow = null;
 let settingsWindow = null;
@@ -30,6 +31,8 @@ app.on('ready', function() {
     setGlobalShortcuts();
 
     setAppMenu();
+
+    getRemoteVersion();
 
 });
 
@@ -207,4 +210,25 @@ function createAboutAppWindow() {
       aboutAppWindow = null;
   });
 }
-//addUpdateMenuItems(template[0].submenu, 1)
+
+
+/*
+* Making remote calls to check version
+*/
+function getRemoteVersion() {
+  var options = {
+      uri: 'https://api.github.com/repos/fkingnoobgg/sound-machine/contents/version.txt',
+      headers: {
+          'User-Agent': 'Request-Promise',
+          'Accept': 'application/vnd.github.VERSION.raw'
+      },
+  };
+
+  rp(options)
+      .then(function (res) {
+          console.log(res);
+      })
+      .catch(function (err) {
+          console.log("something went wrong while retrieving version")
+      });
+}
